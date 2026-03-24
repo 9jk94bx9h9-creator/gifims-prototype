@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIFIMS — GST Intelligence & Fraud Investigation Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --navy:#0a1628;--navy2:#0f2040;--navy3:#1a3260;
+    --accent:#1e88e5;--accent2:#00bcd4;
+    --gold:#f59e0b;--red:#ef4444;--green:#22c55e;--orange:#f97316;
+    --text:#e8edf4;--text2:#94a3b8;--text3:#64748b;
+    --border:#1e3a5f;--card:#0d1f3c;--card2:#111f38;
+    --font:'IBM Plex Sans',sans-serif;--mono:'IBM Plex Mono',monospace;
+  }
+  body{font-family:var(--font);background:var(--navy);color:var(--text);font-size:13px;line-height:1.5}
+  .app{display:flex;height:100vh;overflow:hidden;min-height:600px}
+  .sidebar{width:220px;background:var(--navy2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+  .logo{padding:18px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .logo-mark{width:32px;height:32px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#fff;letter-spacing:0.5px}
+  .logo-text{font-size:11px;font-weight:500;line-height:1.3;color:var(--text)}
+  .logo-sub{font-size:9px;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase}
+  .nav{flex:1;padding:12px 0;overflow-y:auto}
+  .nav-section{padding:8px 16px 4px;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text3)}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:8px 16px;cursor:pointer;color:var(--text2);font-size:12px;border-left:2px solid transparent;transition:all 0.15s}
+  .nav-item:hover{background:rgba(30,136,229,0.08);color:var(--text)}
+  .nav-item.active{background:rgba(30,136,229,0.15);color:var(--accent);border-left-color:var(--accent)}
+  .nav-icon{width:16px;height:16px;opacity:0.8;flex-shrink:0}
+  .nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;padding:1px 6px;border-radius:10px;font-weight:500}
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  .topbar{height:52px;background:var(--navy2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0}
+  .page-title{font-size:15px;font-weight:500;flex:1}
+  .badge{padding:3px 10px;border-radius:4px;font-size:11px;font-weight:500}
+  .badge-blue{background:rgba(30,136,229,0.2);color:#60a5fa}
+  .badge-red{background:rgba(239,68,68,0.2);color:#f87171}
+  .badge-green{background:rgba(34,197,94,0.2);color:#4ade80}
+  .badge-gold{background:rgba(245,158,11,0.2);color:#fbbf24}
+  .badge-orange{background:rgba(249,115,22,0.2);color:#fb923c}
+  .badge-gray{background:rgba(100,116,139,0.2);color:#94a3b8}
+  .btn{padding:7px 14px;border-radius:5px;font-size:12px;font-weight:500;cursor:pointer;border:none;font-family:var(--font);transition:all 0.15s}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:#1976d2}
+  .btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border)}
+  .btn-outline:hover{background:var(--card2);color:var(--text)}
+  .btn-danger{background:var(--red);color:#fff}
+  .btn-success{background:var(--green);color:#000}
+  .content{flex:1;overflow-y:auto;padding:20px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  .metric-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .metric-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+  .metric-value{font-size:26px;font-weight:600;color:var(--text);font-family:var(--mono)}
+  .metric-sub{font-size:11px;color:var(--text2);margin-top:4px}
+  .metric-up{color:var(--green)}
+  .metric-down{color:var(--red)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+  .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .card-title{font-size:13px;font-weight:500;color:var(--text)}
+  .table{width:100%;border-collapse:collapse}
+  .table th{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;font-weight:500}
+  .table td{padding:10px 10px;border-bottom:1px solid rgba(30,58,95,0.5);font-size:12px;color:var(--text2)}
+  .table tr:hover td{background:rgba(30,136,229,0.04)}
+  .table td:first-child{color:var(--text)}
+  .risk-bar{width:60px;height:5px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;display:inline-block}
+  .risk-fill{height:100%;border-radius:3px}
+  .screen{display:none}
+  .screen.active{display:block}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .form-row.full{grid-template-columns:1fr;margin-bottom:14px}
+  .form-group{display:flex;flex-direction:column;gap:5px}
+  .form-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+  .form-input{background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border 0.15s}
+  .form-input:focus{border-color:var(--accent)}
+  .form-input::placeholder{color:var(--text3)}
+  .form-select{background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:8px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;appearance:none;cursor:pointer}
+  .form-textarea{background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:10px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;resize:vertical;min-height:80px;width:100%}
+  .upload-zone{border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;color:var(--text3);font-size:13px;transition:all 0.15s}
+  .upload-zone:hover{border-color:var(--accent);color:var(--text2)}
+  .timeline{list-style:none;position:relative}
+  .timeline::before{content:'';position:absolute;left:16px;top:0;bottom:0;width:1px;background:var(--border)}
+  .timeline-item{display:flex;gap:14px;margin-bottom:16px;position:relative}
+  .timeline-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--navy);flex-shrink:0;margin-top:4px;z-index:1;margin-left:12px}
+  .timeline-dot.warn{background:var(--gold)}
+  .timeline-dot.ok{background:var(--green)}
+  .timeline-dot.red{background:var(--red)}
+  .timeline-content{flex:1}
+  .timeline-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px}
+  .timeline-meta{font-size:11px;color:var(--text3)}
+  .approval-action{display:flex;gap:10px;margin-top:12px}
+  .stat-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(30,58,95,0.4)}
+  .stat-row:last-child{border-bottom:none}
+  .stat-label{font-size:12px;color:var(--text2);flex:1}
+  .stat-val{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--text)}
+  .alert-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:6px;margin-bottom:8px}
+  .alert-dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0}
+  .alert-text{font-size:12px;color:var(--text2);flex:1}
+  .alert-time{font-size:11px;color:var(--text3)}
+  .workflow-steps{display:flex;align-items:center;gap:0;margin-bottom:20px;overflow-x:auto;padding-bottom:4px}
+  .wf-step{display:flex;align-items:center;flex-shrink:0}
+  .wf-label{padding:6px 12px;border-radius:4px;font-size:11px;font-weight:500;white-space:nowrap}
+  .wf-label.done{background:rgba(34,197,94,0.15);color:#4ade80}
+  .wf-label.current{background:rgba(30,136,229,0.2);color:#60a5fa;border:1px solid rgba(30,136,229,0.4)}
+  .wf-label.pending{background:rgba(100,116,139,0.1);color:var(--text3)}
+  .wf-arrow{color:var(--text3);padding:0 4px;font-size:10px}
+  .user-chip{display:flex;align-items:center;gap:8px;padding:6px 10px;background:var(--card2);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text2);cursor:pointer}
+  .avatar{width:26px;height:26px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;flex-shrink:0}
+  .donut-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+  .donut-wrap svg{transform:rotate(-90deg)}
+  .donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text)}
+  .donut-sub{font-size:9px;color:var(--text3)}
+  .legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+  .bar-track{height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;flex:1}
+  .bar-fill{height:100%;border-radius:3px}
+  .notification-dot{width:7px;height:7px;background:var(--red);border-radius:50%;border:1.5px solid var(--navy2)}
+  .enforcement-card{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:14px;margin-bottom:10px}
+  .enforcement-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .tag{padding:2px 8px;border-radius:3px;font-size:10px;font-weight:500;letter-spacing:0.3px}
+  .tag-blue{background:rgba(30,136,229,0.15);color:#60a5fa}
+  .tag-red{background:rgba(239,68,68,0.15);color:#f87171}
+  .tag-green{background:rgba(34,197,94,0.15);color:#4ade80}
+  .tag-gold{background:rgba(245,158,11,0.15);color:#fbbf24}
+  .tag-gray{background:rgba(100,116,139,0.15);color:#94a3b8}
+  .topbar-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);padding:4px 10px;background:var(--card);border:1px solid var(--border);border-radius:20px}
+  .live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  .progress-ring{width:120px;height:120px;position:relative;flex-shrink:0}
+  .progress-ring svg{transform:rotate(-90deg)}
+  .progress-ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+  select option{background:#0f2040}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">GST</div>
+      <div>
+        <div class="logo-text">GIFIMS</div>
+        <div class="logo-sub">Intelligence Platform</div>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active" onclick="showScreen('dashboard',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" opacity="0.9"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor" opacity="0.6"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor" opacity="0.6"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity="0.9"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-section">Operations</div>
+      <div class="nav-item" onclick="showScreen('tip',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1L9.5 6H14.5L10.5 9L12 14L8 11L4 14L5.5 9L1.5 6H6.5L8 1Z" fill="currentColor" opacity="0.8"/></svg>
+        Tip Intake
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('cases',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 3V2a1 1 0 011-1h4a1 1 0 011 1v1" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Case Management
+      </div>
+      <div class="nav-item" onclick="showScreen('approval',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        Approval Queue
+        <span class="nav-badge">5</span>
+      </div>
+      <div class="nav-item" onclick="showScreen('investigation',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Investigation
+      </div>
+      <div class="nav-section">Enforcement</div>
+      <div class="nav-item" onclick="showScreen('enforcement',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1L14 4v5c0 3.5-3 5.5-6 6-3-0.5-6-2.5-6-6V4L8 1z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+        Enforcement
+      </div>
+      <div class="nav-item" onclick="showScreen('recovery',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        Recovery
+      </div>
+      <div class="nav-section">Analytics</div>
+      <div class="nav-item" onclick="showScreen('risk',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12L6 7l3 3 5-7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        AI Risk Scoring
+      </div>
+      <div class="nav-section">Admin</div>
+      <div class="nav-item" onclick="showScreen('audit',this)">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 5h6M5 8h4M5 11h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Audit Logs
+      </div>
+    </nav>
+    <div style="padding:12px 16px;border-top:1px solid var(--border)">
+      <div class="user-chip">
+        <div class="avatar">AK</div>
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text);font-weight:500">Amit Kumar</div>
+          <div style="font-size:10px;color:var(--text3)">Supervisor · MH</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="page-title">Intelligence Dashboard</div>
+      <div class="topbar-status"><div class="live-dot"></div>Live</div>
+      <div style="font-size:11px;color:var(--text3)">Zone: Maharashtra · MH</div>
+      <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:5px;font-size:11px;color:#f87171">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M8 7v3M8 12v0.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        5 High Risk
+      </div>
+      <button class="btn btn-primary" style="font-size:11px;padding:6px 12px" onclick="showScreen('tip',document.querySelector('.nav-item:nth-child(5)'))">+ New Tip</button>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="screen active" id="screen-dashboard">
+        <div class="grid4">
+          <div class="metric-card"><div class="metric-label">Total Cases</div><div class="metric-value">1,284</div><div class="metric-sub"><span class="metric-up">+34</span> this month</div></div>
+          <div class="metric-card"><div class="metric-label">Under Investigation</div><div class="metric-value">218</div><div class="metric-sub"><span class="metric-up">12 new</span> today</div></div>
+          <div class="metric-card"><div class="metric-label">Recovery (₹ Cr)</div><div class="metric-value">94.3</div><div class="metric-sub"><span class="metric-up">+₹8.2Cr</span> this month</div></div>
+          <div class="metric-card"><div class="metric-label">Pending Approval</div><div class="metric-value">47</div><div class="metric-sub"><span class="metric-down">5 urgent</span></div></div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Risk Distribution</div><span class="badge badge-blue">Live</span></div>
+            <div style="display:flex;align-items:center;gap:20px">
+              <div class="donut-wrap">
+                <svg width="80" height="80" viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#ef4444" stroke-width="10" stroke-dasharray="60 141" stroke-linecap="round"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#f59e0b" stroke-width="10" stroke-dasharray="48 141" stroke-linecap="round" stroke-dashoffset="-62"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#22c55e" stroke-width="10" stroke-dasharray="33 141" stroke-linecap="round" stroke-dashoffset="-112"/>
+                </svg>
+                <div class="donut-center"><div style="font-size:14px;font-weight:600;font-family:var(--mono)">1,284</div><div class="donut-sub">Cases</div></div>
+              </div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:8px"><span class="legend-dot" style="background:var(--red)"></span><span style="font-size:12px;color:var(--text2);flex:1">High Risk</span><span style="font-family:var(--mono);font-size:13px;font-weight:500">412</span></div>
+                <div style="display:flex;align-items:center;gap:8px"><span class="legend-dot" style="background:var(--gold)"></span><span style="font-size:12px;color:var(--text2);flex:1">Medium</span><span style="font-family:var(--mono);font-size:13px;font-weight:500">387</span></div>
+                <div style="display:flex;align-items:center;gap:8px"><span class="legend-dot" style="background:var(--green)"></span><span style="font-size:12px;color:var(--text2);flex:1">Low Risk</span><span style="font-family:var(--mono);font-size:13px;font-weight:500">485</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Recovery Trend (₹ Cr)</div></div>
+            <div style="display:flex;align-items:flex-end;gap:3px;height:80px;margin-bottom:6px">
+              <div style="flex:1;border-radius:2px 2px 0 0;height:40%;background:rgba(30,136,229,0.4)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:55%;background:rgba(30,136,229,0.4)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:48%;background:rgba(30,136,229,0.4)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:70%;background:rgba(30,136,229,0.5)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:60%;background:rgba(30,136,229,0.5)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:80%;background:rgba(30,136,229,0.5)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:68%;background:rgba(30,136,229,0.5)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:90%;background:rgba(30,136,229,0.6)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:75%;background:rgba(30,136,229,0.6)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:95%;background:var(--accent)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:85%;background:var(--accent)"></div>
+              <div style="flex:1;border-radius:2px 2px 0 0;height:100%;background:var(--accent)"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)"><span>Apr</span><span>Jun</span><span>Aug</span><span>Oct</span><span>Dec</span><span>Mar</span></div>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;gap:20px">
+              <div><div style="font-size:10px;color:var(--text3)">Total Recovered</div><div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--green)">₹94.3 Cr</div></div>
+              <div><div style="font-size:10px;color:var(--text3)">Pending</div><div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--gold)">₹41.8 Cr</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Recent High-Risk Cases</div><span class="badge badge-red">5 Critical</span></div>
+            <table class="table">
+              <thead><tr><th>Case ID</th><th>GSTIN</th><th>Risk</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr onclick="showScreen('investigation',document.querySelectorAll('.nav-item')[4])" style="cursor:pointer">
+                  <td style="color:var(--accent);font-family:var(--mono)">GIF-2024-0891</td><td style="font-family:var(--mono);font-size:11px">27AAPF…3Z1</td>
+                  <td><div style="display:flex;align-items:center;gap:6px"><div class="risk-bar"><div class="risk-fill" style="width:87%;background:var(--red)"></div></div><span style="font-family:var(--mono);font-size:11px;color:var(--red)">87</span></div></td>
+                  <td><span class="badge badge-red" style="font-size:10px">Investigating</span></td>
+                </tr>
+                <tr><td style="color:var(--accent);font-family:var(--mono)">GIF-2024-0876</td><td style="font-family:var(--mono);font-size:11px">27BKRG…7P2</td>
+                  <td><div style="display:flex;align-items:center;gap:6px"><div class="risk-bar"><div class="risk-fill" style="width:82%;background:var(--red)"></div></div><span style="font-family:var(--mono);font-size:11px;color:var(--red)">82</span></div></td>
+                  <td><span class="badge badge-gold" style="font-size:10px">Approval</span></td>
+                </tr>
+                <tr><td style="color:var(--accent);font-family:var(--mono)">GIF-2024-0864</td><td style="font-family:var(--mono);font-size:11px">27MNOP…4Q8</td>
+                  <td><div style="display:flex;align-items:center;gap:6px"><div class="risk-bar"><div class="risk-fill" style="width:76%;background:var(--orange)"></div></div><span style="font-family:var(--mono);font-size:11px;color:var(--orange)">76</span></div></td>
+                  <td><span class="badge badge-blue" style="font-size:10px">Assigned</span></td>
+                </tr>
+                <tr><td style="color:var(--accent);font-family:var(--mono)">GIF-2024-0855</td><td style="font-family:var(--mono);font-size:11px">27TUVW…9R3</td>
+                  <td><div style="display:flex;align-items:center;gap:6px"><div class="risk-bar"><div class="risk-fill" style="width:91%;background:var(--red)"></div></div><span style="font-family:var(--mono);font-size:11px;color:var(--red)">91</span></div></td>
+                  <td><span class="badge badge-red" style="font-size:10px">Enforcement</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Security Alerts</div><span class="badge badge-red">Live</span></div>
+            <div class="alert-row"><div class="alert-dot"></div><div class="alert-text">Failed login — 5 attempts · Officer ID OFR-0042</div><div class="alert-time">2m ago</div></div>
+            <div class="alert-row"><div class="alert-dot"></div><div class="alert-text">Unusual bulk case access · 47 records · IP 103.21.x</div><div class="alert-time">18m ago</div></div>
+            <div style="height:1px;background:var(--border);margin:10px 0"></div>
+            <div class="card-title" style="margin-bottom:10px;font-size:12px">Officer Performance</div>
+            <div class="stat-row"><span class="stat-label">Ravi Sharma (OFR-021)</span><span class="tag tag-green">18 cases</span></div>
+            <div class="stat-row"><span class="stat-label">Priya Nair (OFR-034)</span><span class="tag tag-green">14 cases</span></div>
+            <div class="stat-row"><span class="stat-label">Suresh Pillai (OFR-019)</span><span class="tag tag-blue">11 cases</span></div>
+            <div class="stat-row"><span class="stat-label">Meena Joshi (OFR-027)</span><span class="tag tag-gray">8 cases</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIP INTAKE -->
+      <div class="screen" id="screen-tip">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Submit Intelligence Tip</div><div style="font-size:11px;color:var(--text3)">All submissions encrypted at rest</div></div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(30,136,229,0.08);border:1px solid rgba(30,136,229,0.2);border-radius:6px;margin-bottom:16px">
+            <input type="checkbox" id="anon-check" onchange="toggleAnon(this)">
+            <label for="anon-check" style="font-size:12px;color:var(--text2);cursor:pointer">Submit anonymously — informer identity will not be stored</label>
+          </div>
+          <div class="form-row" id="informer-fields">
+            <div class="form-group"><label class="form-label">Informer Name</label><input class="form-input" type="text" placeholder="Full name (optional)"></div>
+            <div class="form-group"><label class="form-label">Contact</label><input class="form-input" type="text" placeholder="Phone / Email (optional)"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">GSTIN <span style="color:var(--red)">*</span></label>
+              <input class="form-input" type="text" placeholder="27AAPFN1234C1ZX" id="gstin-input" oninput="validateGSTIN(this)" maxlength="15">
+              <div id="gstin-status" style="font-size:11px;margin-top:3px;display:none"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" type="text" placeholder="Registered business name"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Fraud Type</label><select class="form-select"><option>ITC Fraudulent Claim</option><option>Fake Invoicing</option><option>GSTR Mismatch</option><option>Suppression of Turnover</option><option>Shell Company Network</option><option>Export Fraud (IGST)</option></select></div>
+            <div class="form-group"><label class="form-label">Location / State</label><select class="form-select"><option>Maharashtra</option><option>Gujarat</option><option>Delhi</option><option>Karnataka</option><option>Tamil Nadu</option><option>Uttar Pradesh</option></select></div>
+          </div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Description <span style="color:var(--red)">*</span></label><textarea class="form-textarea" placeholder="Provide specific details: dates, transaction amounts, involved parties, method of fraud..."></textarea></div></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Estimated Evasion Amount</label><input class="form-input" type="text" placeholder="₹ (approximate)"></div>
+            <div class="form-group"><label class="form-label">Supporting Documents</label><div class="upload-zone">Click to upload · PDF, JPG, PNG · Max 10MB</div></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
+            <button class="btn btn-outline">Save Draft</button>
+            <button class="btn btn-primary" onclick="submitTip()">Submit Tip →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CASE MANAGEMENT -->
+      <div class="screen" id="screen-cases">
+        <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center">
+          <input class="form-input" type="text" placeholder="Search by Case ID, GSTIN, business..." style="flex:1">
+          <select class="form-select" style="width:140px"><option>All Status</option><option>New</option><option>Approved</option><option>Assigned</option><option>Under Investigation</option><option>Action Taken</option><option>Closed</option></select>
+          <select class="form-select" style="width:120px"><option>All Risk</option><option>High (70+)</option><option>Medium (40–70)</option><option>Low (0–40)</option></select>
+        </div>
+        <div class="card" style="padding:0">
+          <table class="table">
+            <thead><tr><th>Case ID</th><th>Business Name</th><th>GSTIN</th><th>Fraud Type</th><th>Risk</th><th>Status</th><th>Officer</th><th>Created</th><th></th></tr></thead>
+            <tbody>
+              <tr onclick="showScreen('investigation',document.querySelectorAll('.nav-item')[4])" style="cursor:pointer">
+                <td style="color:var(--accent);font-family:var(--mono);font-size:12px">GIF-2024-0891</td><td>Shree Traders Pvt Ltd</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">27AAPF…3Z1</td><td><span class="tag tag-red">ITC Fraud</span></td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="risk-bar"><div class="risk-fill" style="width:87%;background:var(--red)"></div></div><span style="font-family:var(--mono);font-size:11px;color:var(--red)">87</span></div></td>
+                <td><span class="badge badge-red" style="font-size:10px">Investigating</span></td><td style="font-size:11px">Ravi Sharma</td><td style="font-size:11px;color:var(--text3)">12 Mar 24</td><td><button class="btn btn-outline" style="font-size:10px;padding:3px 8px">View</button></td>
+              </tr>
+              <tr><td style="color:var(--accent);font-family:var(--mono);font-size:12px">GIF-2024-0876</td><td>Apex Solutions Ltd</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">27BKRG…7P2</td><td><span class="tag tag-gold">Fake Invoice</span></td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="risk-bar"><div class="risk-fill" style="width:82%;background:var(--red)"></div></div><span style="font-family:var(--mono);font-size:11px;color:var(--red)">82</span></div></td>
+                <td><span class="badge badge-gold" style="font-size:10px">Pending Approval</span></td><td style="font-size:11px">—</td><td style="font-size:11px;color:var(--text3)">10 Mar 24</td><td><button class="btn btn-outline" style="font-size:10px;padding:3px 8px">View</button></td>
+              </tr>
+              <tr><td style="color:var(--accent);font-family:var(--mono);font-size:12px">GIF-2024-0864</td><td>Modern Enterprises</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">27MNOP…4Q8</td><td><span class="tag tag-blue">GSTR Mismatch</span></td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="risk-bar"><div class="risk-fill" style="width:76%;background:var(--orange)"></div></div><span style="font-family:var(--mono);font-size:11px;color:var(--orange)">76</span></div></td>
+                <td><span class="badge badge-blue" style="font-size:10px">Assigned</span></td><td style="font-size:11px">Priya Nair</td><td style="font-size:11px;color:var(--text3)">8 Mar 24</td><td><button class="btn btn-outline" style="font-size:10px;padding:3px 8px">View</button></td>
+              </tr>
+              <tr><td style="color:var(--accent);font-family:var(--mono);font-size:12px">GIF-2024-0831</td><td>Pioneer Exports Pvt</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">27PXYZ…9T5</td><td><span class="tag tag-blue">Export IGST</span></td>
+                <td><div style="display:flex;align-items:center;gap:6px"><div class="risk-bar"><div class="risk-fill" style="width:91%;background:var(--red)"></div></div><span style="font-family:var(--mono);font-size:11px;color:var(--red)">91</span></div></td>
+                <td><span class="badge badge-red" style="font-size:10px">Enforcement</span></td><td style="font-size:11px">Ravi Sharma</td><td style="font-size:11px;color:var(--text3)">22 Feb 24</td><td><button class="btn btn-outline" style="font-size:10px;padding:3px 8px">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- APPROVAL -->
+      <div class="screen" id="screen-approval">
+        <div class="grid2">
+          <div>
+            <div style="font-size:11px;color:var(--text3);margin-bottom:12px">5 cases awaiting supervisor decision</div>
+            <div class="card" style="border-color:var(--accent)">
+              <div style="display:flex;justify-content:space-between;margin-bottom:10px"><div><div style="font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500">GIF-2024-0876</div><div style="font-size:14px;font-weight:500;margin-top:2px">Apex Solutions Ltd</div></div><span class="badge badge-red">Risk: 82</span></div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:6px">Fake Invoicing · ₹3.2 Cr · Maharashtra</div>
+              <div style="display:flex;gap:6px"><span class="tag tag-red">Duplicate Invoice</span><span class="tag tag-gold">ITC Mismatch</span></div>
+            </div>
+            <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><div style="font-family:var(--mono);font-size:12px;color:var(--accent)">GIF-2024-0879</div><div style="font-size:13px;font-weight:500">Bhavna Textiles</div></div><span class="badge badge-gold">Risk: 74</span></div><div style="font-size:11px;color:var(--text3)">GSTR Mismatch · ₹1.8 Cr · Gujarat</div></div>
+            <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><div style="font-family:var(--mono);font-size:12px;color:var(--accent)">GIF-2024-0883</div><div style="font-size:13px;font-weight:500">Velocity Logistics</div></div><span class="badge badge-red">Risk: 88</span></div><div style="font-size:11px;color:var(--text3)">Shell Company Network · ₹7.4 Cr · Delhi</div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Case Details — GIF-2024-0876</div></div>
+            <div class="stat-row"><span class="stat-label">Business</span><span class="stat-val">Apex Solutions Ltd</span></div>
+            <div class="stat-row"><span class="stat-label">GSTIN</span><span class="stat-val" style="font-family:var(--mono);font-size:11px">27BKRG7891P2Z7</span></div>
+            <div class="stat-row"><span class="stat-label">Est. Evasion</span><span class="stat-val" style="color:var(--red)">₹3.2 Crore</span></div>
+            <div class="stat-row"><span class="stat-label">Credibility</span><span class="stat-val">78 / 100</span></div>
+            <div style="margin-top:14px;padding:10px 12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:6px;font-size:12px;color:var(--text2)">
+              <div style="font-weight:500;color:var(--gold);margin-bottom:4px">AI Risk Reasoning</div>
+              ITC claimed (₹2.8Cr) exceeds 80% of turnover · GSTR-1 vs 3B mismatch of ₹1.4Cr · 3 linked GSTINs flagged
+            </div>
+            <div style="margin-top:14px"><label class="form-label" style="margin-bottom:6px;display:block">Supervisor Notes</label><textarea class="form-textarea" placeholder="Add remarks..." style="min-height:70px"></textarea></div>
+            <div class="approval-action">
+              <button class="btn btn-success" style="flex:1;font-size:12px" onclick="toast('Case approved · Assignment engine triggered','var(--green)')">Approve</button>
+              <button class="btn btn-outline" style="flex:1;font-size:12px">Request Info</button>
+              <button class="btn btn-danger" style="flex:1;font-size:12px" onclick="toast('Case rejected · Tip archived','var(--red)')">Reject</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INVESTIGATION -->
+      <div class="screen" id="screen-investigation">
+        <div class="workflow-steps">
+          <div class="wf-step"><span class="wf-label done">Tip Intake</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label done">Pre-Screen</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label done">Risk Score</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label done">Approved</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label done">Assigned</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label current">Investigating</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label pending">Enforcement</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label pending">Recovery</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label pending">Legal</span><span class="wf-arrow">›</span></div>
+          <div class="wf-step"><span class="wf-label pending">Closure</span></div>
+        </div>
+        <div class="grid2">
+          <div>
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;margin-bottom:12px"><div><div style="font-family:var(--mono);font-size:11px;color:var(--text3)">CASE</div><div style="font-family:var(--mono);font-size:20px;font-weight:600;color:var(--accent)">GIF-2024-0891</div></div><span class="badge badge-red">Risk: 87</span></div>
+              <div class="stat-row"><span class="stat-label">Business</span><span class="stat-val">Shree Traders Pvt Ltd</span></div>
+              <div class="stat-row"><span class="stat-label">GSTIN</span><span class="stat-val" style="font-family:var(--mono);font-size:11px">27AAPF…••••3Z1</span></div>
+              <div class="stat-row"><span class="stat-label">Assigned To</span><span class="stat-val">Ravi Sharma (OFR-021)</span></div>
+              <div class="stat-row"><span class="stat-label">Est. Evasion</span><span class="stat-val" style="color:var(--red)">₹5.8 Crore</span></div>
+              <div style="margin-top:14px"><label class="form-label" style="margin-bottom:6px;display:block">Add Investigation Note</label><textarea class="form-textarea" id="inv-note" placeholder="Record findings..." style="min-height:70px"></textarea><div style="display:flex;gap:8px;margin-top:8px"><div class="upload-zone" style="flex:1;padding:10px;font-size:11px">+ Attach Evidence</div><button class="btn btn-primary" onclick="addNote()">Log Note</button></div></div>
+              <div style="margin-top:12px;display:flex;gap:8px"><button class="btn btn-outline" style="font-size:11px" onclick="showScreen('enforcement',document.querySelectorAll('.nav-item')[6])">→ Enforcement</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Activity Log</div><span class="badge badge-blue">Encrypted</span></div>
+            <ul class="timeline" id="timeline">
+              <li class="timeline-item"><div class="timeline-dot red"></div><div class="timeline-content"><div class="timeline-title">Tip received · Credibility 81/100</div><div class="timeline-meta">12 Mar 2024 · Anonymous tip</div></div></li>
+              <li class="timeline-item"><div class="timeline-dot warn"></div><div class="timeline-content"><div class="timeline-title">AI Risk Score: 87 — High Risk flagged</div><div class="timeline-meta">12 Mar 2024 · AI Engine</div></div></li>
+              <li class="timeline-item"><div class="timeline-dot"></div><div class="timeline-content"><div class="timeline-title">Approved by Supervisor: Amit Kumar</div><div class="timeline-meta">13 Mar 2024 · Remarks: Proceed with urgency</div></div></li>
+              <li class="timeline-item"><div class="timeline-dot"></div><div class="timeline-content"><div class="timeline-title">Assigned to Ravi Sharma (OFR-021)</div><div class="timeline-meta">13 Mar 2024 · Auto-assigned by region + workload</div></div></li>
+              <li class="timeline-item"><div class="timeline-dot ok"></div><div class="timeline-content"><div class="timeline-title">Site visit conducted · 3 geo-tagged photos</div><div class="timeline-meta">15 Mar 2024 · Ravi Sharma</div></div></li>
+              <li class="timeline-item"><div class="timeline-dot warn"></div><div class="timeline-content"><div class="timeline-title">GSTR-2A vs 3B discrepancy confirmed: ₹4.1 Cr</div><div class="timeline-meta">16 Mar 2024 · Evidence uploaded</div></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ENFORCEMENT -->
+      <div class="screen" id="screen-enforcement">
+        <div class="grid3" style="margin-bottom:16px">
+          <div class="metric-card"><div class="metric-label">Notices Issued</div><div class="metric-value">342</div></div>
+          <div class="metric-card"><div class="metric-label">Summons Served</div><div class="metric-value">89</div></div>
+          <div class="metric-card"><div class="metric-label">Search & Seizure</div><div class="metric-value">23</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Issue Enforcement Action — GIF-2024-0891</div></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Action Type</label><select class="form-select"><option>Notice (SCN)</option><option>Summons</option><option>Search & Seizure</option><option>Registration Suspension</option></select></div>
+            <div class="form-group"><label class="form-label">Due Date</label><input class="form-input" type="date" value="2024-04-01"></div>
+          </div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Section / Provision</label><input class="form-input" type="text" placeholder="e.g. Section 73, CGST Act 2017"></div></div>
+          <div class="form-row full"><div class="form-group"><label class="form-label">Action Details</label><textarea class="form-textarea" placeholder="Detail the enforcement action..."></textarea></div></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px"><button class="btn btn-outline">Preview Notice</button><button class="btn btn-danger" onclick="toast('Enforcement action issued · Logged in audit','var(--red)')">Issue Action</button></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent Actions</div></div>
+          <div class="enforcement-card"><div class="enforcement-header"><span style="font-family:var(--mono);font-size:12px;color:var(--accent)">GIF-2024-0831</span><span class="tag tag-red">Search & Seizure</span></div><div style="font-size:12px;color:var(--text2);margin-bottom:4px">Pioneer Exports Pvt Ltd · Section 67, CGST Act</div><div style="font-size:11px;color:var(--text3)">Issued 18 Mar 2024 · ₹7.4 Cr at stake</div></div>
+          <div class="enforcement-card"><div class="enforcement-header"><span style="font-family:var(--mono);font-size:12px;color:var(--accent)">GIF-2024-0845</span><span class="tag tag-gold">Summons</span></div><div style="font-size:12px;color:var(--text2);margin-bottom:4px">Sunrise Commodities · Section 70, CGST Act</div><div style="font-size:11px;color:var(--text3)">Issued 5 Mar 2024 · Due 20 Mar 2024</div></div>
+        </div>
+      </div>
+
+      <!-- RECOVERY -->
+      <div class="screen" id="screen-recovery">
+        <div class="grid3" style="margin-bottom:16px">
+          <div class="metric-card"><div class="metric-label">Total Demand</div><div class="metric-value">₹136.1 Cr</div></div>
+          <div class="metric-card"><div class="metric-label">Recovered</div><div class="metric-value" style="color:var(--green)">₹94.3 Cr</div></div>
+          <div class="metric-card"><div class="metric-label">Pending</div><div class="metric-value" style="color:var(--red)">₹41.8 Cr</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recovery Pipeline</div></div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text2)">Pioneer Exports — GIF-0831</span><span style="font-family:var(--mono);color:var(--green)">₹5.2 Cr / ₹7.4 Cr</span></div><div class="bar-track"><div class="bar-fill" style="width:70%;background:var(--green)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text2)">Shree Traders — GIF-0891</span><span style="font-family:var(--mono);color:var(--gold)">₹0 / ₹5.8 Cr</span></div><div class="bar-track"><div class="bar-fill" style="width:0%;background:var(--gold)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text2)">Sunrise Commodities — GIF-0845</span><span style="font-family:var(--mono);color:var(--green)">₹3.1 Cr / ₹4.0 Cr</span></div><div class="bar-track"><div class="bar-fill" style="width:78%;background:var(--green)"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text2)">Apex Solutions — GIF-0876</span><span style="font-family:var(--mono);color:var(--red)">₹0.4 Cr / ₹3.2 Cr</span></div><div class="bar-track"><div class="bar-fill" style="width:13%;background:var(--red)"></div></div></div>
+          </div>
+          <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px"><div class="bar-track" style="flex:1;height:10px;border-radius:5px"><div class="bar-fill" style="width:69%;background:var(--green);height:100%;border-radius:5px"></div></div><span style="font-size:12px;color:var(--green);font-family:var(--mono);font-weight:500">69% recovered</span></div>
+        </div>
+      </div>
+
+      <!-- AI RISK SCORING -->
+      <div class="screen" id="screen-risk">
+        <div class="grid2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">AI Risk Score Engine</div><span class="badge badge-blue">FastAPI · Rule-based</span></div>
+            <div class="form-group" style="margin-bottom:12px"><label class="form-label">GSTIN</label><input class="form-input" type="text" placeholder="27AAPFN1234C1ZX" id="risk-gstin"></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Turnover (₹ Cr)</label><input class="form-input" type="number" placeholder="0.00" id="risk-turnover"></div>
+              <div class="form-group"><label class="form-label">ITC Claimed (₹ Cr)</label><input class="form-input" type="number" placeholder="0.00" id="risk-itc"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">GSTR Mismatch</label><select class="form-select" id="risk-mismatch"><option value="0">No mismatch</option><option value="1">Minor (&lt;10%)</option><option value="2">Moderate (10–30%)</option><option value="3">Severe (&gt;30%)</option></select></div>
+              <div class="form-group"><label class="form-label">Prior Offences</label><select class="form-select" id="risk-history"><option value="0">None</option><option value="1">1 offence</option><option value="2">2 offences</option><option value="3">3+</option></select></div>
+            </div>
+            <div class="form-group" style="margin-bottom:14px"><label class="form-label">Industry</label><select class="form-select" id="risk-industry"><option>Electronics</option><option>Textiles</option><option>Construction</option><option>Exports</option><option>FMCG</option><option>Services</option></select></div>
+            <button class="btn btn-primary" style="width:100%" onclick="calcRisk()">Run Risk Analysis →</button>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Risk Assessment Output</div></div>
+            <div style="display:flex;align-items:center;gap:20px;margin-bottom:16px">
+              <div class="progress-ring">
+                <svg width="120" height="120" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="10"/>
+                  <circle cx="60" cy="60" r="50" fill="none" id="risk-ring" stroke="#22c55e" stroke-width="10" stroke-dasharray="0 314" stroke-linecap="round" style="transition:all 0.8s"/>
+                </svg>
+                <div class="progress-ring-center"><div style="font-size:28px;font-weight:600;font-family:var(--mono);color:var(--text)" id="risk-num">—</div><div style="font-size:10px;color:var(--text3)">/ 100</div></div>
+              </div>
+              <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Risk Level</div><div style="font-size:22px;font-weight:600;margin-bottom:8px" id="risk-level">—</div><div style="font-size:11px;color:var(--text3)">POST /ai/risk-score</div></div>
+            </div>
+            <div id="risk-reasons" style="display:none">
+              <div style="font-size:12px;font-weight:500;margin-bottom:8px">Triggered Rules</div>
+              <div id="risk-reasons-list" style="display:flex;flex-direction:column;gap:6px"></div>
+              <div style="margin-top:14px;padding:10px 12px;background:var(--card2);border-radius:6px;border:1px solid var(--border)">
+                <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:6px">API RESPONSE</div>
+                <pre style="font-size:11px;color:var(--text2);font-family:var(--mono);white-space:pre-wrap" id="risk-json"></pre>
+              </div>
+            </div>
+            <div id="risk-placeholder" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;color:var(--text3);text-align:center;font-size:13px">Enter details and run analysis</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AUDIT LOGS -->
+      <div class="screen" id="screen-audit">
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <input class="form-input" type="text" placeholder="Search by user, action, case ID..." style="flex:1">
+          <select class="form-select" style="width:140px"><option>All Actions</option><option>Login</option><option>Case Update</option><option>Approval</option><option>Enforcement</option></select>
+          <select class="form-select" style="width:120px"><option>Last 24 hours</option><option>Last 7 days</option><option>Last 30 days</option></select>
+        </div>
+        <div style="padding:8px 12px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);border-radius:6px;margin-bottom:14px;font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px">
+          Append-only · Tamper-evident · ISO 27001 compliant · All logs signed
+        </div>
+        <div class="card" style="padding:0">
+          <table class="table">
+            <thead><tr><th>Timestamp</th><th>User</th><th>Role</th><th>Action</th><th>Resource</th><th>IP Address</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">2024-03-16 14:32:11</td><td>Amit Kumar</td><td><span class="tag tag-blue">Supervisor</span></td><td>CASE_APPROVE</td><td style="font-family:var(--mono);font-size:11px;color:var(--accent)">GIF-2024-0891</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">103.21.48.62</td><td><span class="tag tag-green">Success</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">2024-03-16 14:28:04</td><td>Ravi Sharma</td><td><span class="tag tag-gray">Officer</span></td><td>CASE_VIEW</td><td style="font-family:var(--mono);font-size:11px;color:var(--accent)">GIF-2024-0891</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">103.21.48.71</td><td><span class="tag tag-green">Success</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">2024-03-16 13:55:02</td><td>Unknown</td><td><span class="tag tag-red">—</span></td><td>LOGIN_FAILED</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">OFR-0042</td><td style="font-family:var(--mono);font-size:11px;color:var(--red)">103.41.22.19</td><td><span class="tag tag-red">Blocked · 5x</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">2024-03-16 13:48:17</td><td>Priya Nair</td><td><span class="tag tag-gray">Officer</span></td><td>EVIDENCE_UPLOAD</td><td style="font-family:var(--mono);font-size:11px;color:var(--accent)">GIF-2024-0864</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">103.21.48.88</td><td><span class="tag tag-green">Success</span></td></tr>
+              <tr><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">2024-03-16 12:10:00</td><td>Admin</td><td><span class="tag tag-gold">Admin</span></td><td>USER_CREATED</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">OFR-0047</td><td style="font-family:var(--mono);font-size:11px;color:var(--text3)">10.0.0.1</td><td><span class="tag tag-green">Success</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">Showing 5 of 4,821 audit events · All times in IST</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:#1e3a5f;border:1px solid var(--accent);color:var(--text);padding:12px 18px;border-radius:8px;font-size:13px;display:none;z-index:9999;max-width:320px"></div>
+
+<script>
+const titles={dashboard:'Intelligence Dashboard',tip:'Tip Intake',cases:'Case Management',approval:'Approval Queue',investigation:'Case GIF-2024-0891 · Investigation',enforcement:'Enforcement Actions',recovery:'Recovery Module',risk:'AI Risk Scoring Engine',audit:'Audit Logs'};
+function showScreen(id,navEl){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(navEl)navEl.classList.add('active');
+  document.getElementById('page-title').textContent=titles[id]||'';
+}
+function toast(msg,col){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.borderColor=col||'var(--accent)';t.style.display='block';
+  setTimeout(()=>{t.style.display='none'},3000);
+}
+function toggleAnon(cb){
+  const f=document.getElementById('informer-fields');
+  f.style.opacity=cb.checked?'0.3':'1';f.style.pointerEvents=cb.checked?'none':'';
+}
+function validateGSTIN(inp){
+  const v=inp.value.toUpperCase();inp.value=v;
+  const el=document.getElementById('gstin-status');
+  if(!v.length){el.style.display='none';return;}
+  const valid=/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(v);
+  el.style.display='block';
+  if(v.length<15){el.style.color='var(--text3)';el.textContent=(15-v.length)+' characters remaining';}
+  else if(valid){el.style.color='var(--green)';el.textContent='✓ Valid GSTIN format';}
+  else{el.style.color='var(--red)';el.textContent='⚠ Invalid GSTIN format';}
+}
+function submitTip(){toast('Tip submitted · Reference: TIP-2024-'+Math.floor(Math.random()*9000+1000),'var(--green)');}
+function addNote(){
+  const val=document.getElementById('inv-note').value.trim();
+  if(!val){toast('Enter a note first','var(--gold)');return;}
+  const tl=document.getElementById('timeline');
+  const now=new Date();
+  const ts=now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'})+' '+now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const li=document.createElement('li');li.className='timeline-item';
+  li.innerHTML='<div class="timeline-dot ok"></div><div class="timeline-content"><div class="timeline-title">'+val.substring(0,80)+'</div><div class="timeline-meta">'+ts+' · Amit Kumar · Manual entry</div></div>';
+  tl.insertBefore(li,tl.firstChild);
+  document.getElementById('inv-note').value='';
+  toast('Note logged and encrypted');
+}
+function calcRisk(){
+  const gstin=document.getElementById('risk-gstin').value||'27XXXXX0000X0Z0';
+  const turnover=parseFloat(document.getElementById('risk-turnover').value)||0;
+  const itc=parseFloat(document.getElementById('risk-itc').value)||0;
+  const mismatch=parseInt(document.getElementById('risk-mismatch').value)||0;
+  const history=parseInt(document.getElementById('risk-history').value)||0;
+  const industry=document.getElementById('risk-industry').value;
+  let score=20;const reasons=[];
+  if(turnover>0&&itc/turnover>0.8){score+=30;reasons.push({t:'ITC > 80% of turnover',s:'Critical',c:'var(--red)'});}
+  else if(turnover>0&&itc/turnover>0.6){score+=15;reasons.push({t:'ITC > 60% of turnover',s:'Warning',c:'var(--gold)'});}
+  if(mismatch>=3){score+=25;reasons.push({t:'Severe GSTR mismatch (>30%)',s:'Critical',c:'var(--red)'});}
+  else if(mismatch===2){score+=15;reasons.push({t:'Moderate GSTR mismatch',s:'Warning',c:'var(--gold)'});}
+  else if(mismatch===1){score+=8;reasons.push({t:'Minor GSTR mismatch',s:'Low',c:'var(--accent)'});}
+  score+=history*8;
+  if(history>0)reasons.push({t:'Prior offences: '+history,s:history>1?'Critical':'Warning',c:history>1?'var(--red)':'var(--gold)'});
+  if(['Electronics','Exports'].includes(industry)){score+=10;reasons.push({t:'High-risk industry: '+industry,s:'Flag',c:'var(--orange)'});}
+  score=Math.min(100,Math.max(0,score));
+  let level,col;
+  if(score>=70){level='High Risk';col='#ef4444';}
+  else if(score>=40){level='Medium Risk';col='#f59e0b';}
+  else{level='Low Risk';col='#22c55e';}
+  document.getElementById('risk-num').textContent=score;
+  document.getElementById('risk-level').textContent=level;
+  document.getElementById('risk-level').style.color=col;
+  const ring=document.getElementById('risk-ring');
+  ring.style.stroke=col;ring.setAttribute('stroke-dasharray',(score/100*314)+' 314');
+  document.getElementById('risk-placeholder').style.display='none';
+  document.getElementById('risk-reasons').style.display='block';
+  document.getElementById('risk-reasons-list').innerHTML=reasons.map(r=>'<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.03);border-radius:5px;border-left:2px solid '+r.c+'"><span style="font-size:12px;color:var(--text2);flex:1">'+r.t+'</span><span style="font-size:10px;padding:2px 8px;border-radius:3px;background:rgba(255,255,255,0.05);color:var(--text3)">'+r.s+'</span></div>').join('')||'<div style="font-size:12px;color:var(--text3)">Baseline score — no rules triggered</div>';
+  document.getElementById('risk-json').textContent=JSON.stringify({risk_score:score,risk_level:level,gstin:gstin.substring(0,10)+'•••',reasons:reasons.map(r=>r.t)},null,2);
+  toast('Analysis complete · Score: '+score+' · '+level,col);
+}
+</script>
+</body>
+</html>
